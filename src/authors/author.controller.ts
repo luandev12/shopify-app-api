@@ -25,11 +25,11 @@ export class AuthorController {
 
     const event: EventAuthRequest = {
       shop: shop?.toString(),
-      hmac: hmac.toString(),
-      code: code.toString(),
-      state: state.toString(),
-      host: host.toString(),
+      host: host?.toString(),
+      hmac: hmac?.toString(),
       timestamp: timestamp.toString(),
+      code: code?.toString(),
+      state: state?.toString(),
     };
 
     const authCallbackServices = await this.authServices.authorCallback(event);

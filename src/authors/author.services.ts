@@ -5,6 +5,7 @@ import crypto = require('crypto');
 
 const queryString = require('querystring');
 const axios = require('axios');
+const nonce = require('nonce')();
 
 import AppConstant from '../constants/app';
 import { Injectable } from '@nestjs/common';
@@ -17,9 +18,9 @@ export interface CallbackResponse {
 
 export interface EventAuthRequest {
   shop: string;
-  hmac?: string;
-  code: string;
-  state: string;
+  hmac: string;
+  code?: string;
+  state?: string;
   host: string;
   timestamp: string;
 }
@@ -34,7 +35,6 @@ export interface AuthorizationResponse {
   message: string;
 }
 
-// @Injectable()
 export class AuthorServices {
   constructor(private appConstants: AppConstant) {}
 
@@ -71,15 +71,15 @@ export class AuthorServices {
   }
 
   async authorCallback(event: EventAuthRequest): Promise<CallbackResponse> {
-    const { shop, hmac, code } = event;
+    const { shop, hmac, code, state } = event;
 
     try {
       if (shop && hmac && code) {
-        const map = Object.assign({}, event);
+        const map = Object.assign({}, { shop, code, state: nonce(), hmac });
         delete map.hmac;
 
         const message = queryString.stringify(map);
-        const providedHmac = Buffer.from(event.hmac, 'utf-8');
+        const providedHmac = Buffer.from(hmac, 'utf-8');
         const generatedHash = Buffer.from(
           crypto
             .createHmac('sha256', process.env.SHOPIFY_API_SECRET)
@@ -95,7 +95,7 @@ export class AuthorServices {
           hashEquals = false;
         }
 
-        // delete cookie browser if running
+        // // delete cookie browser if running
         // if (!hashEquals) {
         //   return {
         //     status: false,
