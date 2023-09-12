@@ -1,14 +1,13 @@
 import nonce from 'nonce';
-import jwt from 'jsonwebtoken';
 import Shopify = require('shopify-api-node');
 import crypto = require('crypto');
 
+const jwt = require('jsonwebtoken');
 const queryString = require('querystring');
 const axios = require('axios');
 const nonce = require('nonce')();
 
 import AppConstant from '../constants/app';
-import { Injectable } from '@nestjs/common';
 
 export interface CallbackResponse {
   status: boolean;
@@ -72,7 +71,7 @@ export class AuthorServices {
 
   async authorCallback(event: EventAuthRequest): Promise<CallbackResponse> {
     const { shop, hmac, code, state } = event;
-
+    console.log(shop, hmac, code, 'authorCallback');
     try {
       if (shop && hmac && code) {
         const map = Object.assign({}, { shop, code, state: nonce(), hmac });
@@ -126,6 +125,8 @@ export class AuthorServices {
           accessToken: resp.data.access_token,
         });
 
+        // save access token to database
+
         return shopify.shop.get().then(() => {
           return {
             status: true,
@@ -153,7 +154,7 @@ export class AuthorServices {
       };
     }
 
-    const token = authorization.split(' ')[1];
+    const token: string = authorization.split(' ')[1];
     const decoded = jwt.verify(token, process.env.SHOPIFY_API_SECRET);
 
     if (!decoded) {
