@@ -2,12 +2,16 @@ import nonce from 'nonce';
 import Shopify = require('shopify-api-node');
 import crypto = require('crypto');
 
+import { PrismaService } from '../prisma/prisma.service';
+import { Store, Prisma } from '@prisma/client';
+
 const jwt = require('jsonwebtoken');
 const queryString = require('querystring');
 const axios = require('axios');
 const nonce = require('nonce')();
 
 import AppConstant from '../constants/app';
+import { Injectable } from '@nestjs/common';
 
 export interface CallbackResponse {
   status: boolean;
@@ -34,8 +38,12 @@ export interface AuthorizationResponse {
   message: string;
 }
 
+@Injectable()
 export class AuthorServices {
-  constructor(private appConstants: AppConstant) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly appConstants: AppConstant,
+  ) {}
 
   async author(shop: string): Promise<CallbackResponse> {
     if (!shop) {
@@ -125,7 +133,28 @@ export class AuthorServices {
           accessToken: resp.data.access_token,
         });
 
-        // save access token to database
+        // save access token to database sqlite prisma
+        try {
+          await this.prisma.store.upsert({
+            where: {
+              shop: event.shop,
+            },
+            create: {
+              access_token: resp.data.access_token,
+              shop: event.shop,
+            },
+            update: {
+              access_token: resp.data.access_token,
+              shop: event.shop,
+            },
+          });
+        } catch (error) {
+          console.log(
+            '%cauthor.services.ts line:143 error',
+            'color: #007acc;',
+            error,
+          );
+        }
 
         return shopify.shop.get().then(() => {
           return {
