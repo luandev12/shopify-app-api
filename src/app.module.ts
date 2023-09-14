@@ -9,6 +9,7 @@ import { LoggerModule } from './logger/logger.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
 import { ProductsModule } from './products/products.module';
 import { PrismaService } from './prisma/prisma.service';
+import { MetafieldModule } from './metafield/metafield.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { PrismaService } from './prisma/prisma.service';
     AuthorModule,
     WebhooksModule,
     ProductsModule,
+    MetafieldModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
