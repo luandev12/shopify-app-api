@@ -2,9 +2,11 @@ import { Module } from '@nestjs/common';
 import { MetafieldController } from './metafield.controller';
 import { MetafieldService } from './metafield.service';
 import { PrismaService } from 'src/prisma/prisma.service';
+import AppConstant from 'src/constants/app';
 
 @Module({
+  imports: [],
+  providers: [MetafieldService, PrismaService, AppConstant],
   controllers: [MetafieldController],
-  providers: [MetafieldService, PrismaService],
 })
 export class MetafieldModule {}
