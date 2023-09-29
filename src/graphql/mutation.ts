@@ -37,3 +37,73 @@ export const DELETE_METAFIELD_TAG = `
     }
   }
 `;
+
+export const WEBHOOK_BULK_OPERATION = `
+  mutation webhookSubscriptionCreate($url: String!){
+    webhookSubscriptionCreate(
+      topic: BULK_OPERATIONS_FINISH
+      webhookSubscription: {
+        format: JSON
+        callbackUrl: $url
+      }
+    ) {
+      userErrors {
+        field
+        message
+      }
+      webhookSubscription {
+        id
+      }
+    }
+  }
+`;
+
+export const INSERT_PRODUCTS_BULK = `
+  mutation {
+    bulkOperationRunQuery(
+      query: """
+      {
+        products {
+          edges {
+            node {
+              id
+              title
+              variants {
+                edges {
+                    node {
+                        title
+                        inventoryQuantity
+                        id
+                        sku
+                        inventoryItem {
+                          id
+                        }
+                        metafields {
+                          edges {
+                            node {
+                              namespace
+                              key
+                              value
+                            }
+                          }
+                        }
+                    }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+    ) {
+      bulkOperation {
+        id
+        status
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+`;

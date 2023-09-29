@@ -19,3 +19,16 @@ export const CUSTOMER_QUERY = `
     }
   }
 `;
+
+export const CURRENT_BULK_OPERATION = `
+  query currentBulkOperation {
+    currentBulkOperation {
+      id
+      fileSize
+      objectCount
+      url
+      status
+      query
+    }
+  }
+`;

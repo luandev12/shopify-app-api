@@ -10,6 +10,7 @@ import { WebhooksModule } from './webhooks/webhooks.module';
 import { ProductsModule } from './products/products.module';
 import { PrismaService } from './prisma/prisma.service';
 import { MetafieldModule } from './metafield/metafield.module';
+import { BulkModule } from './bulk/bulk.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { MetafieldModule } from './metafield/metafield.module';
     WebhooksModule,
     ProductsModule,
     MetafieldModule,
+    BulkModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
