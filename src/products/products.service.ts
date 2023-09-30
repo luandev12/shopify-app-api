@@ -27,9 +27,11 @@ export class ProductsService {
     });
   }
 
-  async getProducts(): Promise<ProductResponse<Shopify.IProduct[]>> {
+  async getProducts(
+    shop: string,
+  ): Promise<ProductResponse<Shopify.IProduct[]>> {
     try {
-      const shopify = await this.shopify('alertrend.myshopify.com');
+      const shopify = await this.shopify(shop);
       const products = await shopify.product.list({ limit: 10 });
 
       return {
@@ -46,9 +48,12 @@ export class ProductsService {
     }
   }
 
-  async getProduct(id: number): Promise<ProductResponse<Shopify.IProduct>> {
+  async getProduct(
+    shop: string,
+    id: number,
+  ): Promise<ProductResponse<Shopify.IProduct>> {
     try {
-      const shopify = await this.shopify('alertrend.myshopify.com');
+      const shopify = await this.shopify(shop);
       const product = await shopify.product.get(id);
 
       return {
@@ -65,9 +70,13 @@ export class ProductsService {
     }
   }
 
-  async updateProduct(id: number, productBodyRequest: ProductBodyRequest) {
+  async updateProduct(
+    shop: string,
+    id: number,
+    productBodyRequest: ProductBodyRequest,
+  ) {
     try {
-      const shopify = await this.shopify('alertrend.myshopify.com');
+      const shopify = await this.shopify(shop);
       const data = await shopify.product.update(id, {
         title: productBodyRequest.title,
       });
@@ -82,9 +91,9 @@ export class ProductsService {
     }
   }
 
-  async deleteProduct(id: number) {
+  async deleteProduct(shop: string, id: number) {
     try {
-      const shopify = await this.shopify('alertrend.myshopify.com');
+      const shopify = await this.shopify(shop);
       const data = await shopify.product.delete(id);
 
       return data;

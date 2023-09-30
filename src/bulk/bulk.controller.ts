@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Res, Response } from '@nestjs/common';
 import { BulkService } from './bulk.service';
 
 @Controller('bulk')
@@ -6,27 +6,30 @@ export class BulkController {
   constructor(private readonly bulkService: BulkService) {}
 
   @Post('/products')
-  async createProductsBulk() {
-    const resp = await this.bulkService.createProductsBulk();
-    return resp;
+  async createProductsBulk(@Res() res) {
+    const resp = await this.bulkService.createProductsBulk(res.locals.shop);
+    return res.json(resp);
   }
 
   @Get('/current')
-  async currentBulkOperation() {
-    const resp = await this.bulkService.currentBulkOperation();
-    return resp;
+  async currentBulkOperation(@Res() res) {
+    const resp = await this.bulkService.currentBulkOperation(res.locals.shop);
+    return res.json(resp);
   }
 
   @Post('/notification')
-  async notificationBulkOperationFinish(@Body() url: string) {
-    const resp = await this.bulkService.webhookBulkOperation(url);
-    return resp;
+  async notificationBulkOperationFinish(@Res() res, @Body() url: string) {
+    const resp = await this.bulkService.webhookBulkOperation(
+      res.locals.shop,
+      url,
+    );
+    return res.json(resp);
   }
 
   @Get('/products')
-  async getProductsBulk() {
-    const resp = await this.bulkService.getProductsBulk();
-    console.log('%cbulk.controller.ts line:10 resp', 'color: #007acc;', resp);
-    return resp;
+  async getProductsBulk(@Res() res) {
+    const resp = await this.bulkService.getProductsBulk(res.locals.shop);
+
+    return res.json(resp);
   }
 }

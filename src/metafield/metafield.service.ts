@@ -32,8 +32,8 @@ export class MetafieldService {
     });
   }
 
-  async getCustomer() {
-    const shopify = await this.shopify('alertrend.myshopify.com');
+  async getCustomer(shop: string) {
+    const shopify = await this.shopify(shop);
 
     const data = await shopify.graphql(CUSTOMER_QUERY, {
       first: 25,
@@ -42,16 +42,16 @@ export class MetafieldService {
     return data.customers.nodes;
   }
 
-  async updateMetafield(metafield: CustomerMetaFieldRequest) {
-    const shopify = await this.shopify('alertrend.myshopify.com');
+  async updateMetafield(shop: string, metafield: CustomerMetaFieldRequest) {
+    const shopify = await this.shopify(shop);
 
     const data = await shopify.graphql(CREATE_METAFIELD_TAG, metafield);
 
     return data;
   }
 
-  async deleteMetafield(metaFieldId: string) {
-    const shopify = await this.shopify('alertrend.myshopify.com');
+  async deleteMetafield(shop: string, metaFieldId: string) {
+    const shopify = await this.shopify(shop);
 
     const data = await shopify.graphql(DELETE_METAFIELD_TAG, {
       id: `${this.appConstant.PREFIX_METAFIELD}/${metaFieldId}`,

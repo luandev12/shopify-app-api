@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Res } from '@nestjs/common';
 import axios from 'axios';
 
 import Shopify = require('shopify-api-node');
@@ -33,16 +33,16 @@ export class BulkService {
     });
   }
 
-  async createProductsBulk() {
-    const shopify = await this.shopify('alertrend.myshopify.com');
+  async createProductsBulk(shop) {
+    const shopify = await this.shopify(shop);
 
     const data = await shopify.graphql(INSERT_PRODUCTS_BULK, {});
 
     return data;
   }
 
-  async webhookBulkOperation(url: string) {
-    const shopify = await this.shopify('alertrend.myshopify.com');
+  async webhookBulkOperation(shop: string, url: string) {
+    const shopify = await this.shopify(shop);
 
     const data = await shopify.graphql(WEBHOOK_BULK_OPERATION, {
       url,
@@ -51,15 +51,15 @@ export class BulkService {
     return data;
   }
 
-  async currentBulkOperation() {
-    const shopify = await this.shopify('alertrend.myshopify.com');
+  async currentBulkOperation(shop: string) {
+    const shopify = await this.shopify(shop);
 
-    const data = await shopify.graphql(CURRENT_BULK_OPERATION, {});
+    const resp = await shopify.graphql(CURRENT_BULK_OPERATION, {});
 
-    return data;
+    return resp;
   }
 
-  async getProductsBulk() {
+  async getProductsBulk(shop: string) {
     try {
       const response = await axios.get(this.appConstant.URL_PRODUCTS_BULK);
 

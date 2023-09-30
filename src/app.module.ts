@@ -1,4 +1,9 @@
-import { Module } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
 import { AppController } from './app.controller';
@@ -11,6 +16,8 @@ import { ProductsModule } from './products/products.module';
 import { PrismaService } from './prisma/prisma.service';
 import { MetafieldModule } from './metafield/metafield.module';
 import { BulkModule } from './bulk/bulk.module';
+import { AuthMiddleware } from './authors/author.middleware';
+import AppConstant from './constants/app';
 
 @Module({
   imports: [
@@ -23,6 +30,12 @@ import { BulkModule } from './bulk/bulk.module';
     BulkModule,
   ],
   controllers: [AppController],
-  providers: [AppService, PrismaService],
+  providers: [AppService, PrismaService, AppConstant],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(AuthMiddleware).forRoutes('products');
+    consumer.apply(AuthMiddleware).forRoutes('customers');
+    consumer.apply(AuthMiddleware).forRoutes('bulk');
+  }
+}
