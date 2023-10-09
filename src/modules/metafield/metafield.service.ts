@@ -2,15 +2,14 @@ import { Injectable } from '@nestjs/common';
 
 import Shopify = require('shopify-api-node');
 
-import { PrismaService } from 'src/prisma/prisma.service';
 import { CUSTOMER_QUERY } from 'src/graphql/query';
 import {
   CREATE_METAFIELD_TAG,
   DELETE_METAFIELD_TAG,
 } from 'src/graphql/mutation';
 import { CustomerMetaFieldRequest } from './dto';
-
-import AppConstant from '../constants/app';
+import AppConstant from 'src/constants/app';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class MetafieldService {

@@ -3,15 +3,14 @@ import Shopify = require('shopify-api-node');
 import crypto = require('crypto');
 
 import { PrismaService } from '../prisma/prisma.service';
-import { Store, Prisma } from '@prisma/client';
 
 const jwt = require('jsonwebtoken');
 const queryString = require('querystring');
 const axios = require('axios');
 const nonce = require('nonce')();
 
-import AppConstant from '../constants/app';
 import { Injectable } from '@nestjs/common';
+import AppConstant from 'src/constants/app';
 
 export interface CallbackResponse {
   status: boolean;
@@ -56,7 +55,7 @@ export class AuthorServices {
     const state = nonce();
     const redirectURL = `${process.env.API_ENDPOINT}/shopify/callback`;
     const apiKey = process.env.SHOPIFY_API_KEY;
-    const scopes = this.appConstants.SCOPES;
+    const scopes = process.env.SCOPES;
 
     const installUrl =
       'https://' +
@@ -69,7 +68,11 @@ export class AuthorServices {
       state +
       '&redirect_uri=' +
       redirectURL;
-
+    console.log(
+      '%cauthor.services.ts line:72 installUrl',
+      'color: #007acc;',
+      installUrl,
+    );
     return {
       status: true,
       message: 'success',

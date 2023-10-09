@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { AuthorServices } from './author.services';
 import { AuthorController } from './author.controller';
-import { PrismaService } from 'src/prisma/prisma.service';
 import AppConstant from 'src/constants/app';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Module({
   imports: [],

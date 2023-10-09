@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import Shopify = require('shopify-api-node');
 import { ProductBodyRequest } from './dto';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 interface ProductResponse<T> {
   data: T;

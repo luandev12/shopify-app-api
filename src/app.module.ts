@@ -1,23 +1,19 @@
-import {
-  MiddlewareConsumer,
-  Module,
-  NestModule,
-  RequestMethod,
-} from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
-import { AuthorModule } from './authors/author.module';
-import { LoggerModule } from './logger/logger.module';
-import { WebhooksModule } from './webhooks/webhooks.module';
-import { ProductsModule } from './products/products.module';
-import { PrismaService } from './prisma/prisma.service';
-import { MetafieldModule } from './metafield/metafield.module';
-import { BulkModule } from './bulk/bulk.module';
-import { AuthMiddleware } from './authors/author.middleware';
 import AppConstant from './constants/app';
+
+import { LoggerModule } from './modules/logger/logger.module';
+import { AuthorModule } from './modules/authors/author.module';
+import { WebhooksModule } from './modules/webhooks/webhooks.module';
+import { ProductsModule } from './modules/products/products.module';
+import { MetafieldModule } from './modules/metafield/metafield.module';
+import { BulkModule } from './modules/bulk/bulk.module';
+import { PrismaService } from './modules/prisma/prisma.service';
+import { AuthMiddleware } from './modules/authors/author.middleware';
 
 @Module({
   imports: [

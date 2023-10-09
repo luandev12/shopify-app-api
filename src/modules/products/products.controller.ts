@@ -16,11 +16,6 @@ export class ProductsController {
 
   @Get('/sync')
   async getProducts(@Res() res): Promise<any> {
-    console.log(
-      '%cproducts.controller.ts line:19 res.locals.shop',
-      'color: #007acc;',
-      res.locals.shop,
-    );
     const resp = await this.productServices.getProducts(res.locals.shop);
 
     return res.json(resp);

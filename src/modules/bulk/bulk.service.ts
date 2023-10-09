@@ -1,16 +1,17 @@
 import { Injectable, Res } from '@nestjs/common';
 import axios from 'axios';
 
+import { PrismaService } from '../prisma/prisma.service';
+
 import Shopify = require('shopify-api-node');
 
 import AppConstant from 'src/constants/app';
-
-import { PrismaService } from 'src/prisma/prisma.service';
 
 import {
   INSERT_PRODUCTS_BULK,
   WEBHOOK_BULK_OPERATION,
 } from 'src/graphql/mutation';
+
 import { CURRENT_BULK_OPERATION } from 'src/graphql/query';
 
 @Injectable()
