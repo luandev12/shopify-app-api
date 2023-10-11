@@ -14,6 +14,7 @@ import { MetafieldModule } from './modules/metafield/metafield.module';
 import { BulkModule } from './modules/bulk/bulk.module';
 import { PrismaService } from './modules/prisma/prisma.service';
 import { AuthMiddleware } from './modules/authors/author.middleware';
+import { ImportProductModule } from './modules/import-product/import-product.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { AuthMiddleware } from './modules/authors/author.middleware';
     ProductsModule,
     MetafieldModule,
     BulkModule,
+    ImportProductModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService, AppConstant],
@@ -33,5 +35,6 @@ export class AppModule implements NestModule {
     consumer.apply(AuthMiddleware).forRoutes('products');
     consumer.apply(AuthMiddleware).forRoutes('customers');
     consumer.apply(AuthMiddleware).forRoutes('bulk');
+    consumer.apply(AuthMiddleware).forRoutes('import-product');
   }
 }

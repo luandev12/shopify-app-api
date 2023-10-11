@@ -107,3 +107,29 @@ export const INSERT_PRODUCTS_BULK = `
     }
   }
 `;
+
+export const STAGED_UPLOADS_CREATE = `
+  mutation {
+    stagedUploadsCreate(
+      input: {
+        resource: BULK_MUTATION_VARIABLES
+        filename: "bulk_op_vars"
+        mimeType: "text/jsonl"
+        httpMethod: POST
+      }
+    ) {
+      userErrors {
+        field
+        message
+      }
+      stagedTargets {
+        url
+        resourceUrl
+        parameters {
+          name
+          value
+        }
+      }
+    }
+  }
+`;

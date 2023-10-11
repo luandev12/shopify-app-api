@@ -9,33 +9,39 @@ import {
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { ProductBodyRequest } from './dto';
+import { ShopifyAuth } from '../authors/shopify.decorator';
 
 @Controller('products')
 export class ProductsController {
   constructor(private productServices: ProductsService) {}
 
   @Get('/sync')
-  async getProducts(@Res() res): Promise<any> {
-    const resp = await this.productServices.getProducts(res.locals.shop);
+  async getProducts(@ShopifyAuth() shopify, @Res() res): Promise<any> {
+    const resp = await this.productServices.getProducts(shopify.shop);
 
     return res.json(resp);
   }
 
   @Get('/:id')
-  async getProduct(@Res() res, @Param('id') id): Promise<any> {
-    const resp = await this.productServices.getProduct(res.locals.shop, id);
+  async getProduct(
+    @ShopifyAuth() shopify,
+    @Res() res,
+    @Param('id') id,
+  ): Promise<any> {
+    const resp = await this.productServices.getProduct(shopify.shop, id);
 
     return res.json(resp);
   }
 
   @Post('/:id')
   async updateProduct(
+    @ShopifyAuth() shopify,
     @Res() res,
     @Param('id') id,
     @Body() productBodyRequest: ProductBodyRequest,
   ): Promise<any> {
     const resp = await this.productServices.updateProduct(
-      res.locals.shop,
+      shopify.shop,
       id,
       productBodyRequest,
     );
@@ -44,8 +50,12 @@ export class ProductsController {
   }
 
   @Delete('/:id')
-  async deleteProduct(@Res() res, @Param('id') id): Promise<any> {
-    const resp = await this.productServices.deleteProduct(res.locals.shop, id);
+  async deleteProduct(
+    @ShopifyAuth() shopify,
+    @Res() res,
+    @Param('id') id,
+  ): Promise<any> {
+    const resp = await this.productServices.deleteProduct(shopify.shop, id);
 
     return res.json(resp);
   }

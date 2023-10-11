@@ -68,11 +68,7 @@ export class AuthorServices {
       state +
       '&redirect_uri=' +
       redirectURL;
-    console.log(
-      '%cauthor.services.ts line:72 installUrl',
-      'color: #007acc;',
-      installUrl,
-    );
+
     return {
       status: true,
       message: 'success',
@@ -82,7 +78,7 @@ export class AuthorServices {
 
   async authorCallback(event: EventAuthRequest): Promise<CallbackResponse> {
     const { shop, hmac, code, state } = event;
-    console.log(shop, hmac, code, 'authorCallback');
+
     try {
       if (shop && hmac && code) {
         const map = Object.assign({}, { shop, code, state: nonce(), hmac });
