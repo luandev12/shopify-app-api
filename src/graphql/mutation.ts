@@ -133,3 +133,22 @@ export const STAGED_UPLOADS_CREATE = `
     }
   }
 `;
+
+export const BULK_OPERATION_RUN_MUTATION = `
+  mutation bulkOperationRunMutation($src: String!) {
+    bulkOperationRunMutation(
+      mutation: "mutation call($input: ProductInput!) { productCreate(input: $input) { product {id title variants(first: 10) {edges {node {id title inventoryQuantity }}}} userErrors { message field } } }"
+      stagedUploadPath: $src
+    ) {
+      bulkOperation {
+        id
+        url
+        status
+      }
+      userErrors {
+        message
+        field
+      }
+    }
+  }
+`;

@@ -2,11 +2,16 @@ import { Injectable } from '@nestjs/common';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as parse from 'csv-parser';
+import axios from 'axios';
 
 import Shopify = require('shopify-api-node');
+import FormData = require('form-data');
 
 import { PrismaService } from '../prisma/prisma.service';
-import { STAGED_UPLOADS_CREATE } from 'src/graphql/mutation';
+import {
+  BULK_OPERATION_RUN_MUTATION,
+  STAGED_UPLOADS_CREATE,
+} from 'src/graphql/mutation';
 
 type CsvParseOption = {
   separator: string;
@@ -50,25 +55,52 @@ export class ImportProductService {
     });
   }
 
-  private async transformDataToJsonL(data: any) {
-    return data.map((obj) => JSON.stringify(obj)).join('\n');
-  }
-
   private transformDataStagedUpload(values: any, key: string) {
     const data = values.find((d) => d.name === key);
     return data.value;
   }
 
-  private async stagedUploadsCreate(shop: string) {
-    const shopify = await this.shopify(shop);
+  private async transformDataToJsonL(data: any) {
+    const result = data
+      .flatMap((obj) => ({
+        input: {
+          title: obj.Title,
+          descriptionHtml: obj['Body (HTML)'],
+          handle: obj.Handle,
+          vendor: obj.Vendor,
+          productType: obj['Type'],
+          tags: obj['Tags'].split(','),
+          status: obj['Status'].toUpperCase(),
+          options: [obj['Option1 Value']],
+          variants: [
+            {
+              price: obj['Variant Price'],
+              weight: parseFloat(obj['Variant Grams']),
+              taxable: obj['Variant Taxable'] === 'true',
+              barcode: obj['Variant Barcode'],
+              requiresShipping: obj['Variant Requires Shipping'] === 'true',
+              compareAtPrice: obj['Variant Compare At Price'] || '0.0',
+              mediaSrc: obj['Variant Image'],
+              inventoryPolicy: obj['Variant Inventory Policy'].toUpperCase(),
+            },
+          ],
+        },
+      }))
+      .map((obj) => JSON.stringify(obj))
+      .join('\n');
 
-    const data = await shopify.graphql(STAGED_UPLOADS_CREATE, {});
-    console.log(
-      '%cimport-product.service.ts line:61 data',
-      'color: #007acc;',
-      data,
+    await fs.writeFileSync(
+      path.join('product_template.jsonl'),
+      result,
+      'utf-8',
     );
 
+    return result;
+  }
+
+  private async stagedUploadsCreate(shop: string) {
+    const shopify = await this.shopify(shop);
+    const data = await shopify.graphql(STAGED_UPLOADS_CREATE, {});
     const staged = data.stagedUploadsCreate.stagedTargets[0];
 
     const updateStore = {
@@ -112,7 +144,49 @@ export class ImportProductService {
     return updateStore;
   }
 
-  private async createBulkProduct(data: any) {}
+  private async createBulkProduct(shop: string, file: string) {
+    const shopify = await this.shopify(shop);
+    const resp = await this.prisma.store.findUnique({ where: { shop } });
+
+    const {
+      bulk_staged_upload_url,
+      bulk_staged_upload_key,
+      bulk_staged_upload_policy,
+      bulk_x_goog_algorithm,
+      bulk_x_goog_credential,
+      bulk_x_goog_date,
+      bulk_x_goog_signature,
+    } = resp;
+
+    // const fileJsonl = fs.createReadStream(path.join('product_template.jsonl'));
+
+    const formData = new FormData();
+    formData.append('key', bulk_staged_upload_key);
+    formData.append('acl', 'private');
+    formData.append('success_action_status', '201');
+    formData.append('policy', bulk_staged_upload_policy);
+    formData.append('x-goog-credential', bulk_x_goog_credential);
+    formData.append('x-goog-algorithm', bulk_x_goog_algorithm);
+    formData.append('x-goog-date', bulk_x_goog_date);
+    formData.append('x-goog-signature', bulk_x_goog_signature);
+    formData.append('Content-Type', 'text/jsonl');
+    formData.append('file', file);
+
+    await axios({
+      url: bulk_staged_upload_url,
+      data: formData,
+      method: 'post',
+      headers: {
+        ...formData.getHeaders(),
+      },
+    });
+
+    const respShopify = await shopify.graphql(BULK_OPERATION_RUN_MUTATION, {
+      src: bulk_staged_upload_key,
+    });
+
+    return respShopify;
+  }
 
   async processImportProductCsv(shop: string) {
     const filePath = path.join(
@@ -121,15 +195,14 @@ export class ImportProductService {
     );
 
     const dataCsv = await this.processStreamCsv(filePath);
-    const dataToJsonl = this.transformDataToJsonL(dataCsv);
+    const dataToJsonl = await this.transformDataToJsonL(dataCsv);
+    await this.stagedUploadsCreate(shop);
 
-    const shopify = await this.shopify(shop);
-    return this.stagedUploadsCreate(shop);
-    console.log(
-      '%cimport-product.service.ts line:66 shopify',
-      'color: #007acc;',
-      shopify,
+    const uploadJsonlToShopify = await this.createBulkProduct(
+      shop,
+      dataToJsonl,
     );
-    return dataToJsonl;
+
+    return uploadJsonlToShopify;
   }
 }
