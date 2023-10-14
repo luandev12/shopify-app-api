@@ -36,7 +36,6 @@ export class BulkService {
 
   async createProductsBulk(shop) {
     const shopify = await this.shopify(shop);
-
     const data = await shopify.graphql(INSERT_PRODUCTS_BULK, {});
 
     return data;
@@ -44,7 +43,6 @@ export class BulkService {
 
   async webhookBulkOperation(shop: string, url: string) {
     const shopify = await this.shopify(shop);
-
     const data = await shopify.graphql(WEBHOOK_BULK_OPERATION, {
       url,
     });
@@ -54,7 +52,6 @@ export class BulkService {
 
   async currentBulkOperation(shop: string) {
     const shopify = await this.shopify(shop);
-
     const resp = await shopify.graphql(CURRENT_BULK_OPERATION, {});
 
     return resp;

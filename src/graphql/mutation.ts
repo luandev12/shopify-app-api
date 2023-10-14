@@ -113,7 +113,7 @@ export const STAGED_UPLOADS_CREATE = `
     stagedUploadsCreate(
       input: {
         resource: BULK_MUTATION_VARIABLES
-        filename: "bulk_op_vars"
+        filename: "products"
         mimeType: "text/jsonl"
         httpMethod: POST
       }
@@ -137,7 +137,7 @@ export const STAGED_UPLOADS_CREATE = `
 export const BULK_OPERATION_RUN_MUTATION = `
   mutation bulkOperationRunMutation($src: String!) {
     bulkOperationRunMutation(
-      mutation: "mutation call($input: ProductInput!) { productCreate(input: $input) { product {id title variants(first: 10) {edges {node {id title inventoryQuantity }}}} userErrors { message field } } }"
+      mutation: "mutation call($input: ProductInput!) { productCreate(input: $input) { product {id title variants(first: 10) {edges {node {id title }}}} userErrors { message field } } }"
       stagedUploadPath: $src
     ) {
       bulkOperation {
